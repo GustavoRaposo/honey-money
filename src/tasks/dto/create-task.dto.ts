@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsDateString,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { RecurrenceDto } from './recurrence.dto.js';
 
 export class CreateTaskDto {
   @ApiProperty({ example: 'Implementar autenticação' })
@@ -24,4 +35,20 @@ export class CreateTaskDto {
   @IsInt()
   @Min(1)
   assignedToId?: number;
+
+  @ApiProperty({ example: '2024-01-15T00:00:00.000Z', required: false })
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @ApiProperty({ example: '2024-01-30T00:00:00.000Z', required: false })
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @ApiProperty({ type: RecurrenceDto, required: false })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RecurrenceDto)
+  recurrence?: RecurrenceDto;
 }

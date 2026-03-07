@@ -1,5 +1,17 @@
 #!/bin/sh
-# Atualiza a Postman Collection antes de cada commit.
+# Validações obrigatórias antes de cada commit.
 # Instalado automaticamente via `npm run prepare`.
 
+set -e
+
+echo "→ typecheck..."
+npm run typecheck
+
+echo "→ lint..."
+npm run lint
+
+echo "→ testes..."
+npm test
+
+echo "→ postman collection..."
 npm run postman:generate && git add honey-money.postman_collection.json

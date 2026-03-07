@@ -10,6 +10,14 @@ export interface TaskWithStatus {
   createdById: number;
   assignedToId: number | null;
   lastUpdatedById: number | null;
+  startDate: Date | null;
+  endDate: Date | null;
+  isRecurrent: boolean;
+  parentTaskId: number | null;
+  recurrenceType: string | null;
+  recurrenceDays: string | null;
+  recurrenceTime: string | null;
+  recurrenceDuration: string | null;
   createdAt: Date;
   updatedAt: Date;
   status: { id: number; code: number; name: string };
@@ -19,7 +27,16 @@ interface CreateTaskData {
   name: string;
   description?: string;
   priority?: number;
+  statusCode?: number;
   assignedToId?: number;
+  startDate?: string;
+  endDate?: string;
+  isRecurrent?: boolean;
+  parentTaskId?: number;
+  recurrenceType?: string;
+  recurrenceDays?: string;
+  recurrenceTime?: string;
+  recurrenceDuration?: string;
   createdById: number;
 }
 
@@ -29,6 +46,8 @@ interface UpdateTaskData {
   priority?: number;
   statusCode?: number;
   assignedToId?: number;
+  startDate?: string;
+  endDate?: string;
   lastUpdatedById?: number;
 }
 
@@ -42,20 +61,20 @@ export class TasksRepository {
     return this.prisma.task.create({
       data,
       include: includeStatus,
-    }) as Promise<TaskWithStatus>;
+    }) as unknown as Promise<TaskWithStatus>;
   }
 
   async findAll(): Promise<TaskWithStatus[]> {
     return this.prisma.task.findMany({
       include: includeStatus,
-    }) as Promise<TaskWithStatus[]>;
+    }) as unknown as Promise<TaskWithStatus[]>;
   }
 
   async findById(id: number): Promise<TaskWithStatus | null> {
     return this.prisma.task.findUnique({
       where: { id },
       include: includeStatus,
-    }) as Promise<TaskWithStatus | null>;
+    }) as unknown as Promise<TaskWithStatus | null>;
   }
 
   async update(id: number, data: UpdateTaskData): Promise<TaskWithStatus> {
@@ -63,7 +82,7 @@ export class TasksRepository {
       where: { id },
       data,
       include: includeStatus,
-    }) as Promise<TaskWithStatus>;
+    }) as unknown as Promise<TaskWithStatus>;
   }
 
   async delete(id: number): Promise<void> {

@@ -69,12 +69,7 @@
       "name": "Criar nova tarefa",
       "request": {
         "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
+        "header": [],
         "url": {
           "raw": "{{baseUrl}}/tasks",
           "host": [
@@ -93,15 +88,6 @@
               "type": "string"
             }
           ]
-        },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Implementar autenticação\",\n  \"description\": \"Adicionar JWT ao projeto\",\n  \"priority\": 1,\n  \"assignedToId\": 2\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
         }
       },
       "response": []
