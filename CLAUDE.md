@@ -182,3 +182,46 @@ npx prisma studio
 - Cada módulo deve importar apenas o que precisa.
 - Módulos compartilhados (ex: autenticação, database) ficam em `src/common/` ou `src/shared/`.
 - Guards, Interceptors e Pipes reutilizáveis ficam em `src/common/`.
+
+## Git — GitHub Flow
+
+O projeto segue o **GitHub Flow**: `master` é sempre deployável e todo trabalho novo sai de uma branch curta.
+
+### Fluxo obrigatório para qualquer mudança
+
+1. Criar uma branch a partir de `master` com o prefixo adequado.
+2. Fazer commits atômicos na branch.
+3. Abrir Pull Request para `master`.
+4. Após aprovação e CI verde, fazer merge e deletar a branch.
+
+### Nomenclatura de branches
+
+```
+feat/<descricao-curta>     nova funcionalidade
+fix/<descricao-curta>      correção de bug
+chore/<descricao-curta>    tarefas de manutenção, deps, config
+refactor/<descricao-curta> refatoração sem mudança de comportamento
+test/<descricao-curta>     adição ou correção de testes
+docs/<descricao-curta>     apenas documentação
+```
+
+Exemplos:
+
+```bash
+git checkout -b feat/expenses-module
+git checkout -b fix/jwt-expiration
+git checkout -b chore/upgrade-prisma
+```
+
+### Commits
+
+Seguir Conventional Commits:
+
+```
+feat: adiciona módulo de despesas
+fix: corrige validação de email duplicado
+chore: atualiza dependências
+refactor: extrai lógica de hash para helper
+test: adiciona testes do ExpensesService
+docs: atualiza README com novas rotas
+```
