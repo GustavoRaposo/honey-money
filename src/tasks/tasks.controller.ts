@@ -12,11 +12,20 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
-import type { TaskResponseDto } from './dto/task-response.dto.js';
+import { TaskResponseDto } from './dto/task-response.dto.js';
 import { TasksService } from './tasks.service.js';
 
 @ApiTags('tasks')
@@ -28,6 +37,7 @@ export class TasksController {
 
   @Post()
   @ApiOperation({ summary: 'Criar nova tarefa' })
+  @ApiCreatedResponse({ type: TaskResponseDto })
   @ApiBody({
     type: CreateTaskDto,
     examples: {
@@ -99,12 +109,15 @@ export class TasksController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todas as tarefas' })
+  @ApiOkResponse({ type: TaskResponseDto, isArray: true })
   async findAll(): Promise<TaskResponseDto[]> {
     return this.tasksService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar tarefa por ID' })
+  @ApiOkResponse({ type: TaskResponseDto })
+  @ApiNotFoundResponse({ description: 'Tarefa não encontrada' })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<TaskResponseDto> {
@@ -113,6 +126,8 @@ export class TasksController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar tarefa' })
+  @ApiOkResponse({ type: TaskResponseDto })
+  @ApiNotFoundResponse({ description: 'Tarefa não encontrada' })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTaskDto,
@@ -124,6 +139,8 @@ export class TasksController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remover tarefa' })
+  @ApiNoContentResponse({ description: 'Tarefa removida com sucesso' })
+  @ApiNotFoundResponse({ description: 'Tarefa não encontrada' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.tasksService.remove(id);
   }
