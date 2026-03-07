@@ -1,4 +1,4 @@
-# 🍯 honey-money
+# honey-money
 
 Backend para gerenciamento de tarefas e controle de gastos pessoais. API REST construída com NestJS, autenticação JWT e banco de dados MySQL.
 
@@ -23,21 +23,35 @@ O projeto segue uma arquitetura em camadas por módulo de domínio:
 
 ```
 src/
-├── auth/               # Autenticação JWT
+├── app.controller.ts       # GET / — informações da aplicação
+├── app.service.ts
+├── app.module.ts
+├── auth/                   # Autenticação JWT
 │   ├── dto/
 │   ├── guards/
 │   ├── strategies/
 │   ├── auth.controller.ts
 │   ├── auth.service.ts
 │   └── auth.module.ts
-├── users/              # Gerenciamento de usuários
+├── users/                  # Gerenciamento de usuários
 │   ├── dto/
 │   ├── users.controller.ts
 │   ├── users.service.ts
 │   ├── users.repository.ts
 │   └── users.module.ts
-├── prisma/             # Serviço global de banco de dados
-└── main.ts
+├── tasks/                  # Gerenciamento de tarefas
+│   ├── dto/
+│   ├── tasks.controller.ts
+│   ├── tasks.service.ts
+│   ├── tasks.repository.ts
+│   └── tasks.module.ts
+├── task-time-tracks/       # Rastreamento de tempo por tarefa
+│   ├── dto/
+│   ├── task-time-tracks.controller.ts
+│   ├── task-time-tracks.service.ts
+│   ├── task-time-tracks.repository.ts
+│   └── task-time-tracks.module.ts
+└── prisma/                 # Serviço global de banco de dados
 ```
 
 Cada camada tem responsabilidade única:
@@ -51,6 +65,12 @@ Cada camada tem responsabilidade única:
 
 ## Rotas
 
+### App
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| `GET` | `/` | Retorna nome e versão da aplicação | — |
+
 ### Auth
 
 | Método | Rota | Descrição | Auth |
@@ -63,6 +83,24 @@ Cada camada tem responsabilidade única:
 |---|---|---|---|
 | `POST` | `/users` | Cria um novo usuário | — |
 | `GET` | `/users/me` | Retorna os dados do usuário autenticado | Bearer |
+
+### Tasks
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| `POST` | `/tasks` | Cria uma nova tarefa | Bearer |
+| `GET` | `/tasks` | Lista todas as tarefas | Bearer |
+| `GET` | `/tasks/:id` | Busca tarefa por ID | Bearer |
+| `PATCH` | `/tasks/:id` | Atualiza uma tarefa | Bearer |
+| `DELETE` | `/tasks/:id` | Remove uma tarefa | Bearer |
+
+### Task Time Tracks
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| `POST` | `/tasks/:taskId/time-tracks/start` | Inicia rastreamento de tempo | Bearer |
+| `PATCH` | `/tasks/:taskId/time-tracks/:id/stop` | Encerra rastreamento de tempo | Bearer |
+| `GET` | `/tasks/:taskId/time-tracks` | Lista rastreamentos de uma tarefa | Bearer |
 
 A documentação interativa completa está disponível em `/docs` (Swagger UI) quando o servidor está rodando.
 
@@ -140,9 +178,9 @@ npm run test:e2e
 Cada módulo tem testes para as três camadas:
 
 ```
-users.controller.spec.ts
-users.service.spec.ts
-users.repository.spec.ts
+<modulo>.controller.spec.ts
+<modulo>.service.spec.ts
+<modulo>.repository.spec.ts
 ```
 
 ---
