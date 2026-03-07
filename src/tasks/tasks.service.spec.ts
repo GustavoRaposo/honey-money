@@ -25,6 +25,12 @@ const taskWithStatus = {
   lastUpdatedById: null,
   startDate: null,
   endDate: null,
+  isRecurrent: false,
+  parentTaskId: null,
+  recurrenceType: null,
+  recurrenceDays: null,
+  recurrenceTime: null,
+  recurrenceDuration: null,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
   status: { id: 1, code: 0, name: 'Backlog' },
@@ -42,6 +48,12 @@ const taskResponse: TaskResponseDto = {
   lastUpdatedById: null,
   startDate: null,
   endDate: null,
+  isRecurrent: false,
+  parentTaskId: null,
+  recurrenceType: null,
+  recurrenceDays: null,
+  recurrenceTime: null,
+  recurrenceDuration: null,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
 };
@@ -62,7 +74,7 @@ describe('TasksService', () => {
   });
 
   describe('create', () => {
-    it('deve criar task com createdById do usuário autenticado', async () => {
+    it('deve criar task simples com createdById do usuário autenticado', async () => {
       mockTasksRepository.create.mockResolvedValue(taskWithStatus);
 
       const dto: CreateTaskDto = {
@@ -73,8 +85,100 @@ describe('TasksService', () => {
 
       const result = await service.create(dto, 1);
 
+      expect(mockTasksRepository.create).toHaveBeenCalledTimes(1);
       expect(mockTasksRepository.create).toHaveBeenCalledWith({ ...dto, createdById: 1 });
       expect(result).toEqual(taskResponse);
+    });
+
+    it('deve criar task recorrente e gerar ocorrências com status To Do', async () => {
+      // Segunda-feira Jan 6 2025: 5 terças até Feb 6 (Jan 7, 14, 21, 28, Feb 4)
+      const parentTask = {
+        ...taskWithStatus,
+        isRecurrent: true,
+        startDate: new Date('2025-01-06T00:00:00.000Z'),
+        recurrenceType: 'WEEKLY',
+        recurrenceDays: '2',
+        recurrenceTime: '09:00',
+        recurrenceDuration: 'MONTH',
+      };
+
+      mockTasksRepository.create
+        .mockResolvedValueOnce(parentTask)
+        .mockResolvedValue({ ...taskWithStatus, statusCode: 1, parentTaskId: 1 });
+
+      const dto: CreateTaskDto = {
+        name: 'Reunião semanal',
+        startDate: '2025-01-06T00:00:00.000Z',
+        recurrence: { type: 'WEEKLY', daysOfWeek: [2], time: '09:00', duration: 'MONTH' },
+      };
+
+      await service.create(dto, 1);
+
+      // 1 task pai + 5 ocorrências
+      expect(mockTasksRepository.create).toHaveBeenCalledTimes(6);
+    });
+
+    it('deve criar ocorrências com statusCode 1 (To Do) e parentTaskId correto', async () => {
+      const parentTask = {
+        ...taskWithStatus,
+        id: 42,
+        isRecurrent: true,
+        startDate: new Date('2025-01-06T00:00:00.000Z'),
+        recurrenceType: 'WEEKLY',
+        recurrenceDays: '2',
+        recurrenceTime: '09:00',
+        recurrenceDuration: 'MONTH',
+      };
+
+      mockTasksRepository.create
+        .mockResolvedValueOnce(parentTask)
+        .mockResolvedValue({ ...taskWithStatus, statusCode: 1, parentTaskId: 42 });
+
+      const dto: CreateTaskDto = {
+        name: 'Reunião semanal',
+        startDate: '2025-01-06T00:00:00.000Z',
+        recurrence: { type: 'WEEKLY', daysOfWeek: [2], time: '09:00', duration: 'MONTH' },
+      };
+
+      await service.create(dto, 1);
+
+      // Verifica a primeira ocorrência (segunda chamada)
+      const firstOccurrence = mockTasksRepository.create.mock.calls[1][0];
+      expect(firstOccurrence.statusCode).toBe(1);
+      expect(firstOccurrence.parentTaskId).toBe(42);
+    });
+
+    it('deve criar task DAILY sem daysOfWeek e gerar 31 ocorrências para janeiro', async () => {
+      // Garante que daysOfWeek é opcional para tipos DAILY e MONTHLY
+      const parentTask = {
+        ...taskWithStatus,
+        isRecurrent: true,
+        startDate: new Date('2025-01-01T00:00:00.000Z'),
+        recurrenceType: 'DAILY',
+        recurrenceTime: '08:00',
+        recurrenceDuration: 'MONTH',
+      };
+
+      mockTasksRepository.create
+        .mockResolvedValueOnce(parentTask)
+        .mockResolvedValue({ ...taskWithStatus, statusCode: 1, parentTaskId: 1 });
+
+      const dto: CreateTaskDto = {
+        name: 'Tarefa diária',
+        startDate: '2025-01-01T00:00:00.000Z',
+        recurrence: { type: 'DAILY', time: '08:00', duration: 'MONTH' },
+      };
+
+      await service.create(dto, 1);
+
+      // 1 pai + 31 ocorrências (Jan 1-31)
+      expect(mockTasksRepository.create).toHaveBeenCalledTimes(32);
+
+      const parentCall = mockTasksRepository.create.mock.calls[0][0];
+      expect(parentCall.isRecurrent).toBe(true);
+      expect(parentCall.recurrenceType).toBe('DAILY');
+      expect(parentCall.recurrenceTime).toBe('08:00');
+      expect(parentCall.recurrenceDuration).toBe('MONTH');
     });
   });
 
