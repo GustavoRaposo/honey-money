@@ -1,0 +1,11 @@
+node_modules
+dist
+
+# Environment
+.env
+
+# Prisma generated client
+/generated/prisma
+
+# Claude Code
+.claude

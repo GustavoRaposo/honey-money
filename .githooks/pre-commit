@@ -1,0 +1,5 @@
+#!/bin/sh
+# Atualiza a Postman Collection antes de cada commit.
+# Instalado automaticamente via `npm run prepare`.
+
+npm run postman:generate && git add honey-money.postman_collection.json
