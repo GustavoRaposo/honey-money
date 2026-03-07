@@ -148,7 +148,8 @@ describe('TasksService', () => {
       expect(firstOccurrence.parentTaskId).toBe(42);
     });
 
-    it('deve salvar os metadados de recorrência na task pai', async () => {
+    it('deve criar task DAILY sem daysOfWeek e gerar 31 ocorrências para janeiro', async () => {
+      // Garante que daysOfWeek é opcional para tipos DAILY e MONTHLY
       const parentTask = {
         ...taskWithStatus,
         isRecurrent: true,
@@ -160,7 +161,7 @@ describe('TasksService', () => {
 
       mockTasksRepository.create
         .mockResolvedValueOnce(parentTask)
-        .mockResolvedValue(taskWithStatus);
+        .mockResolvedValue({ ...taskWithStatus, statusCode: 1, parentTaskId: 1 });
 
       const dto: CreateTaskDto = {
         name: 'Tarefa diária',
@@ -169,6 +170,9 @@ describe('TasksService', () => {
       };
 
       await service.create(dto, 1);
+
+      // 1 pai + 31 ocorrências (Jan 1-31)
+      expect(mockTasksRepository.create).toHaveBeenCalledTimes(32);
 
       const parentCall = mockTasksRepository.create.mock.calls[0][0];
       expect(parentCall.isRecurrent).toBe(true);

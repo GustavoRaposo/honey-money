@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsString, Matches, Max, Min } from 'class-validator';
-import { RecurrenceDuration, RecurrenceType } from '../recurrence.util.js';
+import { IsArray, IsEnum, IsInt, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
+import type { RecurrenceDuration, RecurrenceType } from '../recurrence.util.js';
 
 export class RecurrenceDto {
   @ApiProperty({ enum: ['DAILY', 'WEEKLY', 'MONTHLY'], example: 'WEEKLY' })
@@ -12,6 +12,7 @@ export class RecurrenceDto {
     example: [2],
     required: false,
   })
+  @IsOptional()
   @IsArray()
   @IsInt({ each: true })
   @Min(0, { each: true })

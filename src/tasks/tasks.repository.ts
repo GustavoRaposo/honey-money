@@ -61,20 +61,20 @@ export class TasksRepository {
     return this.prisma.task.create({
       data,
       include: includeStatus,
-    }) as Promise<TaskWithStatus>;
+    }) as unknown as Promise<TaskWithStatus>;
   }
 
   async findAll(): Promise<TaskWithStatus[]> {
     return this.prisma.task.findMany({
       include: includeStatus,
-    }) as Promise<TaskWithStatus[]>;
+    }) as unknown as Promise<TaskWithStatus[]>;
   }
 
   async findById(id: number): Promise<TaskWithStatus | null> {
     return this.prisma.task.findUnique({
       where: { id },
       include: includeStatus,
-    }) as Promise<TaskWithStatus | null>;
+    }) as unknown as Promise<TaskWithStatus | null>;
   }
 
   async update(id: number, data: UpdateTaskData): Promise<TaskWithStatus> {
@@ -82,7 +82,7 @@ export class TasksRepository {
       where: { id },
       data,
       include: includeStatus,
-    }) as Promise<TaskWithStatus>;
+    }) as unknown as Promise<TaskWithStatus>;
   }
 
   async delete(id: number): Promise<void> {
