@@ -104,6 +104,7 @@ export class TasksService {
       lastUpdatedById: task.lastUpdatedById,
       startDate: task.startDate,
       endDate: task.endDate,
+      isRunning: task.isRunning,
       isRecurrent: task.isRecurrent,
       parentTaskId: task.parentTaskId,
       recurrenceType: task.recurrenceType,

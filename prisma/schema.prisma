@@ -17,6 +17,7 @@ model User {
   createdTasks     Task[] @relation("TaskCreatedBy")
   assignedTasks    Task[] @relation("TaskAssignedTo")
   lastUpdatedTasks Task[] @relation("TaskLastUpdatedBy")
+  timeTracks       TaskTimeTrack[]
 
   @@map("users")
 }
@@ -42,6 +43,7 @@ model Task {
   lastUpdatedById Int?      @map("last_updated_by_id")
   startDate          DateTime? @map("start_date")
   endDate            DateTime? @map("end_date")
+  isRunning          Boolean   @default(false) @map("is_running")
   isRecurrent        Boolean   @default(false) @map("is_recurrent")
   parentTaskId       Int?      @map("parent_task_id")
   recurrenceType     String?   @map("recurrence_type")
@@ -57,6 +59,22 @@ model Task {
   lastUpdatedBy User?      @relation("TaskLastUpdatedBy", fields: [lastUpdatedById], references: [id])
   parent        Task?      @relation("TaskOccurrences", fields: [parentTaskId], references: [id])
   children      Task[]     @relation("TaskOccurrences")
+  timeTracks    TaskTimeTrack[]
 
   @@map("tasks")
+}
+
+model TaskTimeTrack {
+  id        Int       @id @default(autoincrement())
+  taskId    Int       @map("task_id")
+  userId    Int       @map("user_id")
+  startDate DateTime  @map("start_date")
+  endDate   DateTime? @map("end_date")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  task Task @relation(fields: [taskId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("task_time_tracks")
 }

@@ -66,6 +66,122 @@
       "response": []
     },
     {
+      "name": "Iniciar rastreamento de tempo em uma tarefa",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/:taskId/time-tracks/start",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks",
+            ":taskId",
+            "time-tracks",
+            "start"
+          ],
+          "variable": [
+            {
+              "key": "taskId",
+              "value": "1",
+              "type": "string"
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Pausar rastreamento de tempo",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/:taskId/time-tracks/:id/stop",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks",
+            ":taskId",
+            "time-tracks",
+            ":id",
+            "stop"
+          ],
+          "variable": [
+            {
+              "key": "taskId",
+              "value": "1",
+              "type": "string"
+            },
+            {
+              "key": "id",
+              "value": "1",
+              "type": "string"
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Listar todos os rastreamentos de uma tarefa",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/:taskId/time-tracks",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks",
+            ":taskId",
+            "time-tracks"
+          ],
+          "variable": [
+            {
+              "key": "taskId",
+              "value": "1",
+              "type": "string"
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Criar nova tarefa",
       "request": {
         "method": "POST",
