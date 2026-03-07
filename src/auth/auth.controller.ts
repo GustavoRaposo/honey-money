@@ -1,7 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
-import type { AuthResponseDto } from './dto/auth-response.dto.js';
+import { AuthResponseDto } from './dto/auth-response.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 
 @ApiTags('auth')
@@ -11,6 +16,8 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Autenticar usuário e obter token JWT' })
+  @ApiCreatedResponse({ type: AuthResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Credenciais inválidas' })
   async login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
     return this.authService.login(dto);
   }
