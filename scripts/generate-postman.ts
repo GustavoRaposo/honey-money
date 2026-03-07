@@ -109,19 +109,30 @@ function findMethodBlock(lines: string[], httpDecoratorLine: number): [number, n
     }
   }
 
-  // Vai para frente até a linha `async <método>(...)` ou próximo decorator de método
+  // Vai para frente até o fim da assinatura do método (fecha o parêntese)
   let blockEnd = httpDecoratorLine;
   while (blockEnd < lines.length - 1) {
     blockEnd++;
     const trimmed = lines[blockEnd].trim();
-    if (
+
+    const isMethodSignature =
       trimmed.startsWith('async ') ||
       trimmed.startsWith('public async') ||
       trimmed.startsWith('private async') ||
-      trimmed.startsWith('protected async')
-    ) {
-      break; // inclui a linha da assinatura (que pode conter @Body())
+      trimmed.startsWith('protected async');
+
+    if (isMethodSignature) {
+      // Rastreia profundidade de parênteses para capturar assinaturas multiline
+      let depth =
+        (trimmed.match(/\(/g) ?? []).length - (trimmed.match(/\)/g) ?? []).length;
+      while (depth > 0 && blockEnd < lines.length - 1) {
+        blockEnd++;
+        const next = lines[blockEnd].trim();
+        depth += (next.match(/\(/g) ?? []).length - (next.match(/\)/g) ?? []).length;
+      }
+      break;
     }
+
     if (!trimmed.startsWith('@') && trimmed !== '') {
       break;
     }
@@ -130,12 +141,24 @@ function findMethodBlock(lines: string[], httpDecoratorLine: number): [number, n
   return [blockStart, blockEnd];
 }
 
+function parseClassLevelAuth(content: string): boolean {
+  // Detecta @UseGuards(JwtAuthGuard) ou @ApiBearerAuth() aplicados na classe
+  const classMatch = content.search(/export\s+class\s+\w+/);
+  if (classMatch === -1) return false;
+  const header = content.substring(0, classMatch);
+  return (
+    header.includes('@UseGuards(JwtAuthGuard)') || header.includes('@ApiBearerAuth()')
+  );
+}
+
 function parseController(filePath: string, dtoFiles: string[]): Route[] {
   const content = fs.readFileSync(filePath, 'utf-8');
   const routes: Route[] = [];
 
   const prefixMatch = content.match(/@Controller\(\s*'([^']*)'\s*\)/);
   const prefix = prefixMatch ? prefixMatch[1] : '';
+
+  const classLevelAuth = parseClassLevelAuth(content);
 
   const lines = content.split('\n');
 
@@ -169,6 +192,8 @@ function parseController(filePath: string, dtoFiles: string[]): Route[] {
       ) {
         needsAuth = true;
       }
+
+      if (classLevelAuth) needsAuth = true;
 
       // Só busca @Body() para métodos que aceitam corpo
       if (!BODYLESS_METHODS.has(httpMethod)) {
@@ -206,6 +231,10 @@ function buildItem(route: Route): object {
     headers.push({ key: 'Content-Type', value: 'application/json' });
   }
 
+  const pathVariables = pathSegments
+    .filter((s) => s.startsWith(':'))
+    .map((s) => ({ key: s.slice(1), value: '1', type: 'string' }));
+
   const request: Record<string, unknown> = {
     method: route.method,
     header: headers,
@@ -213,6 +242,7 @@ function buildItem(route: Route): object {
       raw: rawUrl,
       host: ['{{baseUrl}}'],
       path: pathSegments,
+      ...(pathVariables.length > 0 && { variable: pathVariables }),
     },
   };
 

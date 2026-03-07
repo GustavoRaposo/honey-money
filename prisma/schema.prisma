@@ -14,5 +14,39 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  createdTasks     Task[] @relation("TaskCreatedBy")
+  assignedTasks    Task[] @relation("TaskAssignedTo")
+  lastUpdatedTasks Task[] @relation("TaskLastUpdatedBy")
+
   @@map("users")
+}
+
+model TaskStatus {
+  id    Int    @id @default(autoincrement())
+  code  Int    @unique
+  name  String
+
+  tasks Task[]
+
+  @@map("task_statuses")
+}
+
+model Task {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  priority        Int      @default(1)
+  statusCode      Int      @default(0) @map("status_code")
+  createdById     Int      @map("created_by_id")
+  assignedToId    Int?     @map("assigned_to_id")
+  lastUpdatedById Int?     @map("last_updated_by_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  status        TaskStatus @relation(fields: [statusCode], references: [code])
+  createdBy     User       @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  assignedTo    User?      @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
+  lastUpdatedBy User?      @relation("TaskLastUpdatedBy", fields: [lastUpdatedById], references: [id])
+
+  @@map("tasks")
 }
