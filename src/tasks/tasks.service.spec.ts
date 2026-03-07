@@ -86,7 +86,10 @@ describe('TasksService', () => {
       const result = await service.create(dto, 1);
 
       expect(mockTasksRepository.create).toHaveBeenCalledTimes(1);
-      expect(mockTasksRepository.create).toHaveBeenCalledWith({ ...dto, createdById: 1 });
+      expect(mockTasksRepository.create).toHaveBeenCalledWith({
+        ...dto,
+        createdById: 1,
+      });
       expect(result).toEqual(taskResponse);
     });
 
@@ -104,12 +107,21 @@ describe('TasksService', () => {
 
       mockTasksRepository.create
         .mockResolvedValueOnce(parentTask)
-        .mockResolvedValue({ ...taskWithStatus, statusCode: 1, parentTaskId: 1 });
+        .mockResolvedValue({
+          ...taskWithStatus,
+          statusCode: 1,
+          parentTaskId: 1,
+        });
 
       const dto: CreateTaskDto = {
         name: 'Reunião semanal',
         startDate: '2025-01-06T00:00:00.000Z',
-        recurrence: { type: 'WEEKLY', daysOfWeek: [2], time: '09:00', duration: 'MONTH' },
+        recurrence: {
+          type: 'WEEKLY',
+          daysOfWeek: [2],
+          time: '09:00',
+          duration: 'MONTH',
+        },
       };
 
       await service.create(dto, 1);
@@ -132,18 +144,30 @@ describe('TasksService', () => {
 
       mockTasksRepository.create
         .mockResolvedValueOnce(parentTask)
-        .mockResolvedValue({ ...taskWithStatus, statusCode: 1, parentTaskId: 42 });
+        .mockResolvedValue({
+          ...taskWithStatus,
+          statusCode: 1,
+          parentTaskId: 42,
+        });
 
       const dto: CreateTaskDto = {
         name: 'Reunião semanal',
         startDate: '2025-01-06T00:00:00.000Z',
-        recurrence: { type: 'WEEKLY', daysOfWeek: [2], time: '09:00', duration: 'MONTH' },
+        recurrence: {
+          type: 'WEEKLY',
+          daysOfWeek: [2],
+          time: '09:00',
+          duration: 'MONTH',
+        },
       };
 
       await service.create(dto, 1);
 
       // Verifica a primeira ocorrência (segunda chamada)
-      const firstOccurrence = mockTasksRepository.create.mock.calls[1][0];
+      const firstOccurrence = (mockTasksRepository.create.mock.calls[1] as unknown[])[0] as {
+        statusCode: number;
+        parentTaskId: number;
+      };
       expect(firstOccurrence.statusCode).toBe(1);
       expect(firstOccurrence.parentTaskId).toBe(42);
     });
@@ -161,7 +185,11 @@ describe('TasksService', () => {
 
       mockTasksRepository.create
         .mockResolvedValueOnce(parentTask)
-        .mockResolvedValue({ ...taskWithStatus, statusCode: 1, parentTaskId: 1 });
+        .mockResolvedValue({
+          ...taskWithStatus,
+          statusCode: 1,
+          parentTaskId: 1,
+        });
 
       const dto: CreateTaskDto = {
         name: 'Tarefa diária',
@@ -174,7 +202,12 @@ describe('TasksService', () => {
       // 1 pai + 31 ocorrências (Jan 1-31)
       expect(mockTasksRepository.create).toHaveBeenCalledTimes(32);
 
-      const parentCall = mockTasksRepository.create.mock.calls[0][0];
+      const parentCall = (mockTasksRepository.create.mock.calls[0] as unknown[])[0] as {
+        isRecurrent: boolean;
+        recurrenceType: string;
+        recurrenceTime: string;
+        recurrenceDuration: string;
+      };
       expect(parentCall.isRecurrent).toBe(true);
       expect(parentCall.recurrenceType).toBe('DAILY');
       expect(parentCall.recurrenceTime).toBe('08:00');
@@ -211,14 +244,21 @@ describe('TasksService', () => {
 
   describe('update', () => {
     it('deve atualizar task com lastUpdatedById do usuário autenticado', async () => {
-      const updatedTask = { ...taskWithStatus, name: 'Nome atualizado', lastUpdatedById: 2 };
+      const updatedTask = {
+        ...taskWithStatus,
+        name: 'Nome atualizado',
+        lastUpdatedById: 2,
+      };
       mockTasksRepository.findById.mockResolvedValue(taskWithStatus);
       mockTasksRepository.update.mockResolvedValue(updatedTask);
 
       const dto: UpdateTaskDto = { name: 'Nome atualizado' };
       const result = await service.update(1, dto, 2);
 
-      expect(mockTasksRepository.update).toHaveBeenCalledWith(1, { ...dto, lastUpdatedById: 2 });
+      expect(mockTasksRepository.update).toHaveBeenCalledWith(1, {
+        ...dto,
+        lastUpdatedById: 2,
+      });
       expect(result.name).toBe('Nome atualizado');
       expect(result.lastUpdatedById).toBe(2);
     });
@@ -226,7 +266,9 @@ describe('TasksService', () => {
     it('deve lançar NotFoundException quando a task não existir', async () => {
       mockTasksRepository.findById.mockResolvedValue(null);
 
-      await expect(service.update(999, {}, 1)).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, {}, 1)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(mockTasksRepository.update).not.toHaveBeenCalled();
     });
   });

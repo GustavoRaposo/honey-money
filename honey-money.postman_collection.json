@@ -19,7 +19,7 @@
   ],
   "item": [
     {
-      "name": "GET /",
+      "name": "Informações da aplicação (nome e versão)",
       "request": {
         "method": "GET",
         "header": [],

@@ -186,6 +186,18 @@ npx prisma studio
 - Módulos compartilhados (ex: autenticação, database) ficam em `src/common/` ou `src/shared/`.
 - Guards, Interceptors e Pipes reutilizáveis ficam em `src/common/`.
 
+## Versionamento semântico
+
+**Ao iniciar qualquer nova implementação**, atualizar o campo `"version"` no `package.json` antes de escrever código, seguindo semver:
+
+| Tipo de mudança | Campo | Exemplo |
+|-----------------|-------|---------|
+| Quebra de compatibilidade / reestruturação | MAJOR | 1.0.0 → 2.0.0 |
+| Nova funcionalidade sem quebra | MINOR | 1.2.0 → 1.3.0 |
+| Correção de bug / ajuste pequeno | PATCH | 1.2.3 → 1.2.4 |
+
+`package.json` é a única fonte de verdade da versão. A rota `GET /` retorna `{ name, version }` lidos diretamente desse arquivo.
+
 ## Validações obrigatórias antes do commit
 
 ### Por que testes passando não garantem build passando
