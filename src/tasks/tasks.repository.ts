@@ -12,6 +12,12 @@ export interface TaskWithStatus {
   lastUpdatedById: number | null;
   startDate: Date | null;
   endDate: Date | null;
+  isRecurrent: boolean;
+  parentTaskId: number | null;
+  recurrenceType: string | null;
+  recurrenceDays: string | null;
+  recurrenceTime: string | null;
+  recurrenceDuration: string | null;
   createdAt: Date;
   updatedAt: Date;
   status: { id: number; code: number; name: string };
@@ -21,9 +27,16 @@ interface CreateTaskData {
   name: string;
   description?: string;
   priority?: number;
+  statusCode?: number;
   assignedToId?: number;
   startDate?: string;
   endDate?: string;
+  isRecurrent?: boolean;
+  parentTaskId?: number;
+  recurrenceType?: string;
+  recurrenceDays?: string;
+  recurrenceTime?: string;
+  recurrenceDuration?: string;
   createdById: number;
 }
 
