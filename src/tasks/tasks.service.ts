@@ -48,6 +48,8 @@ export class TasksService {
       createdById: task.createdById,
       assignedToId: task.assignedToId,
       lastUpdatedById: task.lastUpdatedById,
+      startDate: task.startDate,
+      endDate: task.endDate,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
     };

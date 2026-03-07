@@ -37,11 +37,13 @@ model Task {
   description     String?
   priority        Int      @default(1)
   statusCode      Int      @default(0) @map("status_code")
-  createdById     Int      @map("created_by_id")
-  assignedToId    Int?     @map("assigned_to_id")
-  lastUpdatedById Int?     @map("last_updated_by_id")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdById     Int       @map("created_by_id")
+  assignedToId    Int?      @map("assigned_to_id")
+  lastUpdatedById Int?      @map("last_updated_by_id")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
   status        TaskStatus @relation(fields: [statusCode], references: [code])
   createdBy     User       @relation("TaskCreatedBy", fields: [createdById], references: [id])

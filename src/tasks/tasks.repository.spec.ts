@@ -21,6 +21,8 @@ const taskWithStatus = {
   createdById: 1,
   assignedToId: null,
   lastUpdatedById: null,
+  startDate: null,
+  endDate: null,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
   status: { id: 1, code: 0, name: 'Backlog' },

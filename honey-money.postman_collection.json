@@ -96,7 +96,7 @@
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Implementar autenticação\",\n  \"description\": \"Adicionar JWT ao projeto\",\n  \"priority\": 1,\n  \"assignedToId\": 2\n}",
+          "raw": "{\n  \"name\": \"Implementar autenticação\",\n  \"description\": \"Adicionar JWT ao projeto\",\n  \"priority\": 1,\n  \"assignedToId\": 2,\n  \"startDate\": \"2024-01-15T00:00:00.000Z\",\n  \"endDate\": \"2024-01-30T00:00:00.000Z\"\n}",
           "options": {
             "raw": {
               "language": "json"

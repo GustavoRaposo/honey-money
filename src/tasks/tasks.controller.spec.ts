@@ -23,6 +23,8 @@ const taskResponse: TaskResponseDto = {
   createdById: 1,
   assignedToId: null,
   lastUpdatedById: null,
+  startDate: null,
+  endDate: null,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
 };

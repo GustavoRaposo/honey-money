@@ -10,6 +10,8 @@ export interface TaskWithStatus {
   createdById: number;
   assignedToId: number | null;
   lastUpdatedById: number | null;
+  startDate: Date | null;
+  endDate: Date | null;
   createdAt: Date;
   updatedAt: Date;
   status: { id: number; code: number; name: string };
@@ -20,6 +22,8 @@ interface CreateTaskData {
   description?: string;
   priority?: number;
   assignedToId?: number;
+  startDate?: string;
+  endDate?: string;
   createdById: number;
 }
 
@@ -29,6 +33,8 @@ interface UpdateTaskData {
   priority?: number;
   statusCode?: number;
   assignedToId?: number;
+  startDate?: string;
+  endDate?: string;
   lastUpdatedById?: number;
 }
 
