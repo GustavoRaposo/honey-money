@@ -4,7 +4,7 @@ export type RecurrenceDuration = 'MONTH' | 'YEAR';
 export interface RecurrenceOptions {
   type: RecurrenceType;
   daysOfWeek?: number[]; // 0=Dom, 1=Seg, ..., 6=Sáb — usado apenas em WEEKLY
-  time: string;          // "HH:MM" em UTC
+  time: string; // "HH:MM" em UTC
   duration: RecurrenceDuration;
 }
 

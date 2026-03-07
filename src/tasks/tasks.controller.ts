@@ -45,7 +45,8 @@ export class TasksController {
       },
       recorrente_semanal: {
         summary: 'Recorrente — WEEKLY',
-        description: 'Toda terça-feira às 9h por um mês. daysOfWeek: 0=Dom 1=Seg 2=Ter 3=Qua 4=Qui 5=Sex 6=Sáb',
+        description:
+          'Toda terça-feira às 9h por um mês. daysOfWeek: 0=Dom 1=Seg 2=Ter 3=Qua 4=Qui 5=Sex 6=Sáb',
         value: {
           name: 'Reunião semanal',
           description: 'Reunião de acompanhamento do time',
@@ -104,7 +105,9 @@ export class TasksController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar tarefa por ID' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<TaskResponseDto> {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<TaskResponseDto> {
     return this.tasksService.findOne(id);
   }
 

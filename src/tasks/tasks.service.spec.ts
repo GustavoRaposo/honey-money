@@ -164,7 +164,9 @@ describe('TasksService', () => {
       await service.create(dto, 1);
 
       // Verifica a primeira ocorrência (segunda chamada)
-      const firstOccurrence = (mockTasksRepository.create.mock.calls[1] as unknown[])[0] as {
+      const firstOccurrence = (
+        mockTasksRepository.create.mock.calls[1] as unknown[]
+      )[0] as {
         statusCode: number;
         parentTaskId: number;
       };
@@ -202,7 +204,9 @@ describe('TasksService', () => {
       // 1 pai + 31 ocorrências (Jan 1-31)
       expect(mockTasksRepository.create).toHaveBeenCalledTimes(32);
 
-      const parentCall = (mockTasksRepository.create.mock.calls[0] as unknown[])[0] as {
+      const parentCall = (
+        mockTasksRepository.create.mock.calls[0] as unknown[]
+      )[0] as {
         isRecurrent: boolean;
         recurrenceType: string;
         recurrenceTime: string;
