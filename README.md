@@ -1,98 +1,171 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🍯 honey-money
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend para gerenciamento de tarefas e controle de gastos pessoais. API REST construída com NestJS, autenticação JWT e banco de dados MySQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Camada | Tecnologia |
+|---|---|
+| Framework | NestJS 11 + TypeScript |
+| Banco de dados | MySQL via Prisma 7 |
+| Autenticação | JWT (passport-jwt) |
+| Hash de senhas | Argon2 |
+| Testes | Jest + TDD |
+| Documentação | Swagger / OpenAPI |
 
-## Project setup
+---
 
-```bash
-$ npm install
+## Arquitetura
+
+O projeto segue uma arquitetura em camadas por módulo de domínio:
+
+```
+src/
+├── auth/               # Autenticação JWT
+│   ├── dto/
+│   ├── guards/
+│   ├── strategies/
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   └── auth.module.ts
+├── users/              # Gerenciamento de usuários
+│   ├── dto/
+│   ├── users.controller.ts
+│   ├── users.service.ts
+│   ├── users.repository.ts
+│   └── users.module.ts
+├── prisma/             # Serviço global de banco de dados
+└── main.ts
 ```
 
-## Compile and run the project
+Cada camada tem responsabilidade única:
+
+- **Controller** — recebe a requisição HTTP e delega ao Service
+- **Service** — contém a lógica de negócio
+- **Repository** — único ponto de acesso ao banco de dados
+- **DTO** — valida e tipifica a entrada/saída via `class-validator`
+
+---
+
+## Rotas
+
+### Auth
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| `POST` | `/auth/login` | Autentica o usuário e retorna um JWT | — |
+
+### Users
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| `POST` | `/users` | Cria um novo usuário | — |
+| `GET` | `/users/me` | Retorna os dados do usuário autenticado | Bearer |
+
+A documentação interativa completa está disponível em `/docs` (Swagger UI) quando o servidor está rodando.
+
+---
+
+## Configuração
+
+### Pré-requisitos
+
+- Node.js 20+
+- MySQL rodando localmente
+
+### Instalação
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+### Variáveis de ambiente
+
+Copie o arquivo de exemplo e preencha com seus valores:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/honey_money_dev"
+JWT_SECRET="seu-segredo-jwt"
+```
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Banco de dados
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Aplicar migrations
+npx prisma migrate dev
+
+# Visualizar os dados
+npx prisma studio
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## Rodando
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# Desenvolvimento (hot reload)
+npm run start:dev
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Produção
+npm run build
+npm run start:prod
+```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Testes
 
-## Stay in touch
+O projeto é desenvolvido com **TDD** — todo código de produção tem um arquivo `.spec.ts` correspondente escrito antes da implementação.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+# Todos os testes unitários
+npm run test
 
-## License
+# Modo watch
+npm run test:watch
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Cobertura
+npm run test:cov
+
+# Testes e2e
+npm run test:e2e
+```
+
+Cada módulo tem testes para as três camadas:
+
+```
+users.controller.spec.ts
+users.service.spec.ts
+users.repository.spec.ts
+```
+
+---
+
+## Postman
+
+O arquivo `honey-money.postman_collection.json` na raiz do projeto pode ser importado diretamente no Postman. Ele contém todas as rotas com exemplos de corpo e header de autenticação prontos.
+
+A collection é **atualizada automaticamente** a cada `git commit` via hook pre-commit — sem necessidade de manutenção manual.
+
+Para gerar manualmente:
+
+```bash
+npm run postman:generate
+```
+
+> **Novo desenvolvedor?** Após clonar o repositório, rode `npm install` — o script `prepare` configura o hook automaticamente.
+
+---
+
+## Segurança
+
+- Senhas armazenadas com **Argon2id** (recomendado pelo OWASP)
+- Tokens JWT com expiração configurável
+- `ValidationPipe` global com `whitelist: true` — campos não declarados no DTO são bloqueados
+- `.env` nunca commitado — apenas `.env.example` no repositório
