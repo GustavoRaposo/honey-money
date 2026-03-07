@@ -38,6 +38,9 @@ npm run lint
 
 # Formatar código
 npm run format
+
+# Verificar tipos (tsconfig de produção, sem gerar build)
+npm run typecheck
 ```
 
 ## TypeScript
@@ -182,6 +185,41 @@ npx prisma studio
 - Cada módulo deve importar apenas o que precisa.
 - Módulos compartilhados (ex: autenticação, database) ficam em `src/common/` ou `src/shared/`.
 - Guards, Interceptors e Pipes reutilizáveis ficam em `src/common/`.
+
+## Validações obrigatórias antes do commit
+
+### Por que testes passando não garantem build passando
+
+O Jest usa `ts-jest` com um tsconfig sobrescrito (`module: CommonJS`, `moduleResolution: node`), que é mais permissivo que o tsconfig de produção. Isso significa que erros específicos das configurações de produção (`isolatedModules: true`, `emitDecoratorMetadata: true`, `moduleResolution: nodenext`) **não são detectados durante `npm test`**.
+
+Exemplos de erros que passam nos testes mas quebram o build:
+
+| Erro | Causa | Detectado por |
+|------|-------|---------------|
+| TS1272: `import type` obrigatório | `isolatedModules` + `emitDecoratorMetadata` | `typecheck` / `build` |
+| TS2352: conversão de tipo inválida | Prisma infers type doesn't overlap | `typecheck` / `build` |
+| Imports sem extensão `.js` | `moduleResolution: nodenext` | `typecheck` / `build` |
+
+### Checklist antes de commitar
+
+Execute **na ordem** (o pre-commit hook faz isso automaticamente):
+
+```bash
+npm run typecheck   # Valida o tsconfig de produção sem gerar build
+npm run lint        # ESLint + Prettier
+npm test            # Testes unitários
+npm run build       # Opcional localmente, obrigatório na CI
+```
+
+### Pre-commit hook
+
+O hook em `.githooks/pre-commit` executa `typecheck → lint → test → postman:generate` automaticamente. Ativado via `npm run prepare` (ou `git config core.hooksPath .githooks`).
+
+**Nunca usar `--no-verify`** para pular o hook. Se o hook falhar, corrija o erro antes de commitar.
+
+### Typecheck separado do build
+
+`npm run typecheck` executa `tsc --noEmit` usando o `tsconfig.json` de produção — mesmos flags do build real, sem gerar arquivos. É mais rápido que `npm run build` e deve ser o primeiro passo de qualquer validação.
 
 ## Git — GitHub Flow
 
