@@ -25,6 +25,7 @@ const taskResponse: TaskResponseDto = {
   lastUpdatedById: null,
   startDate: null,
   endDate: null,
+  isRunning: false,
   isRecurrent: false,
   parentTaskId: null,
   recurrenceType: null,

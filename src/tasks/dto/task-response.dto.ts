@@ -35,6 +35,9 @@ export class TaskResponseDto {
   endDate: Date | null;
 
   @ApiProperty({ example: false })
+  isRunning: boolean;
+
+  @ApiProperty({ example: false })
   isRecurrent: boolean;
 
   @ApiProperty({ example: null, nullable: true })

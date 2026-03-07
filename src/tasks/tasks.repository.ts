@@ -12,6 +12,7 @@ export interface TaskWithStatus {
   lastUpdatedById: number | null;
   startDate: Date | null;
   endDate: Date | null;
+  isRunning: boolean;
   isRecurrent: boolean;
   parentTaskId: number | null;
   recurrenceType: string | null;
@@ -87,5 +88,9 @@ export class TasksRepository {
 
   async delete(id: number): Promise<void> {
     await this.prisma.task.delete({ where: { id } });
+  }
+
+  async setRunning(id: number, isRunning: boolean): Promise<void> {
+    await this.prisma.task.update({ where: { id }, data: { isRunning } });
   }
 }

@@ -43,10 +43,17 @@ export class TasksService {
     return this.toResponseDto(task);
   }
 
-  async update(id: number, dto: UpdateTaskDto, userId: number): Promise<TaskResponseDto> {
+  async update(
+    id: number,
+    dto: UpdateTaskDto,
+    userId: number,
+  ): Promise<TaskResponseDto> {
     const existing = await this.tasksRepository.findById(id);
     if (!existing) throw new NotFoundException('Tarefa não encontrada.');
-    const task = await this.tasksRepository.update(id, { ...dto, lastUpdatedById: userId });
+    const task = await this.tasksRepository.update(id, {
+      ...dto,
+      lastUpdatedById: userId,
+    });
     return this.toResponseDto(task);
   }
 
@@ -97,6 +104,7 @@ export class TasksService {
       lastUpdatedById: task.lastUpdatedById,
       startDate: task.startDate,
       endDate: task.endDate,
+      isRunning: task.isRunning,
       isRecurrent: task.isRecurrent,
       parentTaskId: task.parentTaskId,
       recurrenceType: task.recurrenceType,

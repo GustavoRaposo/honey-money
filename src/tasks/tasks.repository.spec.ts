@@ -23,6 +23,7 @@ const taskWithStatus = {
   lastUpdatedById: null,
   startDate: null,
   endDate: null,
+  isRunning: false,
   isRecurrent: false,
   parentTaskId: null,
   recurrenceType: null,
@@ -123,6 +124,22 @@ describe('TasksRepository', () => {
 
       expect(mockPrismaService.task.delete).toHaveBeenCalledWith({
         where: { id: 1 },
+      });
+    });
+  });
+
+  describe('setRunning', () => {
+    it('deve atualizar isRunning da task', async () => {
+      mockPrismaService.task.update.mockResolvedValue({
+        ...taskWithStatus,
+        isRunning: true,
+      });
+
+      await repository.setRunning(1, true);
+
+      expect(mockPrismaService.task.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { isRunning: true },
       });
     });
   });

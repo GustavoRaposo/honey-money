@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsInt, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  Min,
+} from 'class-validator';
 import type { RecurrenceDuration, RecurrenceType } from '../recurrence.util.js';
 
 export class RecurrenceDto {
@@ -19,7 +28,10 @@ export class RecurrenceDto {
   @Max(6, { each: true })
   daysOfWeek?: number[];
 
-  @ApiProperty({ example: '09:00', description: 'Horário UTC no formato HH:MM' })
+  @ApiProperty({
+    example: '09:00',
+    description: 'Horário UTC no formato HH:MM',
+  })
   @IsString()
   @Matches(/^\d{2}:\d{2}$/, { message: 'time deve estar no formato HH:MM' })
   time: string;

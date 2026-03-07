@@ -25,4 +25,11 @@ export class PrismaClient {
     delete: jest.fn(),
     count: jest.fn(),
   };
+  taskTimeTrack = {
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    findMany: jest.fn(),
+    findFirst: jest.fn(),
+    update: jest.fn(),
+  };
 }
