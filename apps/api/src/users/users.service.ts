@@ -4,10 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as argon2 from 'argon2';
-import type { User } from '@prisma/client';
 import type { CreateUserDto } from './dto/create-user.dto.js';
 import type { UserResponseDto } from './dto/user-response.dto.js';
-import { UsersRepository } from './users.repository.js';
+import { UsersRepository, type UserWithProfile } from './users.repository.js';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +27,7 @@ export class UsersService {
     return this.toResponseDto(user);
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<UserWithProfile | null> {
     return this.usersRepository.findByEmail(email);
   }
 
@@ -40,11 +39,12 @@ export class UsersService {
     return this.toResponseDto(user);
   }
 
-  private toResponseDto(user: User): UserResponseDto {
+  private toResponseDto(user: UserWithProfile): UserResponseDto {
     return {
       id: user.id,
       name: user.name,
       email: user.email,
+      profile: { id: user.profile.id, name: user.profile.name },
       createdAt: user.createdAt,
     };
   }

@@ -10,6 +10,17 @@ const mockPrismaService = {
   },
 };
 
+const dbUser = {
+  id: 1,
+  name: 'João Silva',
+  email: 'joao@email.com',
+  password: 'hashed_password',
+  profileId: 1,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  profile: { id: 1, name: 'user' },
+};
+
 describe('UsersRepository', () => {
   let repository: UsersRepository;
 
@@ -26,20 +37,11 @@ describe('UsersRepository', () => {
   });
 
   describe('create', () => {
-    it('deve criar um usuário e retornar os dados persistidos', async () => {
+    it('deve criar um usuário com profile padrão e retornar os dados com profile', async () => {
       const dto: CreateUserDto = {
         name: 'João Silva',
         email: 'joao@email.com',
         password: 'hashed_password',
-      };
-
-      const dbUser = {
-        id: 1,
-        name: dto.name,
-        email: dto.email,
-        password: dto.password,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
       mockPrismaService.user.create.mockResolvedValue(dbUser);
@@ -48,30 +50,23 @@ describe('UsersRepository', () => {
 
       expect(mockPrismaService.user.create).toHaveBeenCalledWith({
         data: dto,
+        include: { profile: true },
       });
-      expect(result).toEqual(dbUser);
+      expect(result.profile).toEqual({ id: 1, name: 'user' });
     });
   });
 
   describe('findByEmail', () => {
-    it('deve retornar o usuário quando o email existir', async () => {
-      const dbUser = {
-        id: 1,
-        name: 'João Silva',
-        email: 'joao@email.com',
-        password: 'hashed_password',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
+    it('deve retornar o usuário com profile quando o email existir', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(dbUser);
 
       const result = await repository.findByEmail('joao@email.com');
 
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({
         where: { email: 'joao@email.com' },
+        include: { profile: true },
       });
-      expect(result).toEqual(dbUser);
+      expect(result?.profile).toEqual({ id: 1, name: 'user' });
     });
 
     it('deve retornar null quando o email não existir', async () => {
@@ -84,24 +79,16 @@ describe('UsersRepository', () => {
   });
 
   describe('findById', () => {
-    it('deve retornar o usuário quando o id existir', async () => {
-      const dbUser = {
-        id: 1,
-        name: 'João Silva',
-        email: 'joao@email.com',
-        password: 'hashed_password',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
+    it('deve retornar o usuário com profile quando o id existir', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(dbUser);
 
       const result = await repository.findById(1);
 
       expect(mockPrismaService.user.findUnique).toHaveBeenCalledWith({
         where: { id: 1 },
+        include: { profile: true },
       });
-      expect(result).toEqual(dbUser);
+      expect(result?.profile).toEqual({ id: 1, name: 'user' });
     });
 
     it('deve retornar null quando o id não existir', async () => {
