@@ -4,6 +4,7 @@ import * as argon2 from 'argon2';
 import { UsersService } from '../users/users.service.js';
 import type { AuthResponseDto } from './dto/auth-response.dto.js';
 import type { LoginDto } from './dto/login.dto.js';
+import type { AuthenticatedUser } from './strategies/jwt.strategy.js';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,16 @@ export class AuthService {
       email: user.email,
       profileId: user.profile.id,
       profileName: user.profile.name,
+    });
+    return { accessToken };
+  }
+
+  refresh(user: AuthenticatedUser): AuthResponseDto {
+    const accessToken = this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+      profileId: user.profileId,
+      profileName: user.profileName,
     });
     return { accessToken };
   }

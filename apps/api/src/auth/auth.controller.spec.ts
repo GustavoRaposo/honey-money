@@ -6,6 +6,7 @@ import { AuthResponseDto } from './dto/auth-response.dto.js';
 
 const mockAuthService = {
   login: jest.fn(),
+  refresh: jest.fn(),
 };
 
 describe('AuthController', () => {
@@ -34,6 +35,26 @@ describe('AuthController', () => {
       const result = await controller.login(dto);
 
       expect(mockAuthService.login).toHaveBeenCalledWith(dto);
+      expect(result).toEqual(response);
+    });
+  });
+
+  describe('POST /auth/refresh', () => {
+    it('deve retornar novo accessToken para usuário autenticado', () => {
+      const req = {
+        user: {
+          id: 1,
+          email: 'joao@email.com',
+          profileId: 1,
+          profileName: 'user',
+        },
+      };
+      const response: AuthResponseDto = { accessToken: 'new_jwt_token' };
+      mockAuthService.refresh.mockReturnValue(response);
+
+      const result = controller.refresh(req as any);
+
+      expect(mockAuthService.refresh).toHaveBeenCalledWith(req.user);
       expect(result).toEqual(response);
     });
   });
