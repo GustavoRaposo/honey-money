@@ -312,15 +312,15 @@ apps/mobile/app/src/
 - Room testado com banco em memória (`Room.inMemoryDatabaseBuilder`).
 - UI com `ComposeTestRule` do `androidx.compose.ui.test`.
 
-### Pre-commit hook (mobile)
+### Pre-commit hook
 
-O hook em `apps/mobile/scripts/pre-commit` roda `./gradlew testDevelopmentDebugUnitTest`.
+O hook raiz (`.githooks/pre-commit`) cobre **ambos os apps**:
 
-Para instalar/reinstalar:
+- **API**: sempre executa `typecheck → lint → test → postman:generate`.
+- **Mobile**: executa `./gradlew testDevelopmentDebugUnitTest` apenas se houver arquivos de `apps/mobile/` no staging (evita build Gradle desnecessário em commits só da API).
+
+Ativado via `npm run prepare` dentro de `apps/api/`. Para reativar após um clone:
 
 ```bash
-cp apps/mobile/scripts/pre-commit apps/mobile/.git/hooks/pre-commit
-chmod +x apps/mobile/.git/hooks/pre-commit
+cd apps/api && npm run prepare
 ```
-
-> No monorepo o hook raiz (`.githooks/pre-commit`) cobre apenas a API. Para o mobile, instale o hook manualmente conforme acima se desenvolver fora do Android Studio.
