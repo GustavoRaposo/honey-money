@@ -1,19 +1,50 @@
 #!/bin/sh
-# Validações obrigatórias antes de cada commit.
-# Instalado automaticamente via `npm run prepare` dentro de apps/api/.
+# Pre-commit hook do monorepo honey-money.
+# Ativado via `npm run prepare` dentro de apps/api/.
+#
+# - API: sempre valida (typecheck → lint → test → postman)
+# - Mobile: valida apenas se houver arquivos de apps/mobile/ no staging
 
 set -e
 
-cd apps/api
+# ── API ──────────────────────────────────────────────────────────────────────
 
-echo "→ typecheck..."
-npm run typecheck
+echo "==> [api] typecheck..."
+(cd apps/api && npm run typecheck)
 
-echo "→ lint..."
-npm run lint
+echo "==> [api] lint..."
+(cd apps/api && npm run lint)
 
-echo "→ testes..."
-npm test
+echo "==> [api] testes..."
+(cd apps/api && npm test)
 
-echo "→ postman collection..."
-npm run postman:generate && git add apps/api/honey-money.postman_collection.json
+echo "==> [api] postman collection..."
+(cd apps/api && npm run postman:generate)
+git add apps/api/honey-money.postman_collection.json
+
+# ── Mobile (somente se houver mudanças staged em apps/mobile/) ───────────────
+
+MOBILE_STAGED=$(git diff --cached --name-only | grep "^apps/mobile/" || true)
+
+if [ -n "$MOBILE_STAGED" ]; then
+    echo "==> [mobile] arquivos staged detectados — rodando testes..."
+
+    # Garantir que JAVA_HOME aponte para o JBR do Android Studio (Windows)
+    if [ -z "$JAVA_HOME" ] || ! command -v java > /dev/null 2>&1; then
+        AS_JBR="/c/Users/Usuario/AppData/Local/Programs/Android Studio/jbr"
+        if [ -d "$AS_JBR" ]; then
+            export JAVA_HOME="$AS_JBR"
+            export PATH="$JAVA_HOME/bin:$PATH"
+        else
+            echo "ERRO: JAVA_HOME não definido e JBR do Android Studio não encontrado em:"
+            echo "  $AS_JBR"
+            echo "Defina JAVA_HOME manualmente antes de commitar."
+            exit 1
+        fi
+    fi
+
+    (cd apps/mobile && ./gradlew testDevelopmentDebugUnitTest --daemon --quiet)
+    echo "==> [mobile] testes passaram."
+else
+    echo "==> [mobile] nenhum arquivo staged — pulando testes."
+fi
