@@ -19,8 +19,10 @@ const dbUser = {
   name: 'João Silva',
   email: 'joao@email.com',
   password: 'hashed_password',
+  profileId: 1,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
+  profile: { id: 1, name: 'user' },
 };
 
 describe('UsersService', () => {
@@ -45,7 +47,7 @@ describe('UsersService', () => {
       password: 'senha123',
     };
 
-    it('deve criar o usuário e retornar UserResponseDto sem a senha', async () => {
+    it('deve criar o usuário e retornar UserResponseDto com profile e sem senha', async () => {
       mockUsersRepository.findByEmail.mockResolvedValue(null);
       (argon2.hash as jest.Mock).mockResolvedValue('hashed_password');
       mockUsersRepository.create.mockResolvedValue(dbUser);
@@ -62,6 +64,7 @@ describe('UsersService', () => {
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,
+        profile: { id: 1, name: 'user' },
         createdAt: dbUser.createdAt,
       });
       expect(result).not.toHaveProperty('password');
@@ -76,12 +79,13 @@ describe('UsersService', () => {
   });
 
   describe('findByEmail', () => {
-    it('deve retornar o usuário completo (com senha) para uso interno', async () => {
+    it('deve retornar o usuário completo com profile para uso interno', async () => {
       mockUsersRepository.findByEmail.mockResolvedValue(dbUser);
 
       const result = await service.findByEmail('joao@email.com');
 
       expect(result).toEqual(dbUser);
+      expect(result?.profile).toEqual({ id: 1, name: 'user' });
     });
 
     it('deve retornar null quando o email não existir', async () => {
@@ -94,7 +98,7 @@ describe('UsersService', () => {
   });
 
   describe('findById', () => {
-    it('deve retornar UserResponseDto quando o usuário existir', async () => {
+    it('deve retornar UserResponseDto com profile quando o usuário existir', async () => {
       mockUsersRepository.findById.mockResolvedValue(dbUser);
 
       const result = await service.findById(1);
@@ -103,6 +107,7 @@ describe('UsersService', () => {
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,
+        profile: { id: 1, name: 'user' },
         createdAt: dbUser.createdAt,
       });
       expect(result).not.toHaveProperty('password');

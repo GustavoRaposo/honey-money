@@ -5,6 +5,11 @@ import { PrismaClient } from '@prisma/client';
 const adapter = new PrismaMariaDb(process.env.DATABASE_URL as string);
 const prisma = new PrismaClient({ adapter });
 
+const profiles = [
+  { id: 1, name: 'user' },
+  { id: 2, name: 'admin' },
+];
+
 const statuses = [
   { code: 0, name: 'Backlog' },
   { code: 1, name: 'To Do' },
@@ -15,6 +20,15 @@ const statuses = [
 ];
 
 async function main(): Promise<void> {
+  for (const profile of profiles) {
+    await prisma.profile.upsert({
+      where: { id: profile.id },
+      update: { name: profile.name },
+      create: profile,
+    });
+    console.log(`[seed] Profile ${profile.id} - ${profile.name}: ok`);
+  }
+
   for (const status of statuses) {
     await prisma.taskStatus.upsert({
       where: { code: status.code },

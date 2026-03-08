@@ -6,17 +6,28 @@ datasource db {
   provider = "mysql"
 }
 
+model Profile {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+
+  users User[]
+
+  @@map("profiles")
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
   password  String
+  profileId Int      @default(1) @map("profile_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  createdTasks     Task[] @relation("TaskCreatedBy")
-  assignedTasks    Task[] @relation("TaskAssignedTo")
-  lastUpdatedTasks Task[] @relation("TaskLastUpdatedBy")
+  profile          Profile         @relation(fields: [profileId], references: [id])
+  createdTasks     Task[]          @relation("TaskCreatedBy")
+  assignedTasks    Task[]          @relation("TaskAssignedTo")
+  lastUpdatedTasks Task[]          @relation("TaskLastUpdatedBy")
   timeTracks       TaskTimeTrack[]
 
   @@map("users")

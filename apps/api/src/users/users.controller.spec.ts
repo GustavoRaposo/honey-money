@@ -13,6 +13,7 @@ const userResponse: UserResponseDto = {
   id: 1,
   name: 'João Silva',
   email: 'joao@email.com',
+  profile: { id: 1, name: 'user' },
   createdAt: new Date('2024-01-01'),
 };
 
