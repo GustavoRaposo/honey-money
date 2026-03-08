@@ -21,8 +21,10 @@ const dbUser = {
   name: 'João Silva',
   email: 'joao@email.com',
   password: 'hashed_password',
+  profileId: 1,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
+  profile: { id: 1, name: 'user' },
 };
 
 describe('AuthService', () => {
@@ -59,6 +61,8 @@ describe('AuthService', () => {
       expect(mockJwtService.sign).toHaveBeenCalledWith({
         sub: dbUser.id,
         email: dbUser.email,
+        profileId: dbUser.profile.id,
+        profileName: dbUser.profile.name,
       });
       expect(result).toEqual({ accessToken: 'jwt_token' });
     });

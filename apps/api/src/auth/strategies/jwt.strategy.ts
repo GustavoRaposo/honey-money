@@ -6,6 +6,15 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 interface JwtPayload {
   sub: number;
   email: string;
+  profileId: number;
+  profileName: string;
+}
+
+export interface AuthenticatedUser {
+  id: number;
+  email: string;
+  profileId: number;
+  profileName: string;
 }
 
 @Injectable()
@@ -18,7 +27,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JwtPayload): { id: number; email: string } {
-    return { id: payload.sub, email: payload.email };
+  validate(payload: JwtPayload): AuthenticatedUser {
+    return {
+      id: payload.sub,
+      email: payload.email,
+      profileId: payload.profileId,
+      profileName: payload.profileName,
+    };
   }
 }
