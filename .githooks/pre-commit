@@ -1,8 +1,10 @@
 #!/bin/sh
 # Validações obrigatórias antes de cada commit.
-# Instalado automaticamente via `npm run prepare`.
+# Instalado automaticamente via `npm run prepare` dentro de apps/api/.
 
 set -e
+
+cd apps/api
 
 echo "→ typecheck..."
 npm run typecheck
@@ -14,4 +16,4 @@ echo "→ testes..."
 npm test
 
 echo "→ postman collection..."
-npm run postman:generate && git add honey-money.postman_collection.json
+npm run postman:generate && git add apps/api/honey-money.postman_collection.json

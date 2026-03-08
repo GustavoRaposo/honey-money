@@ -11,7 +11,4 @@ dist/
 coverage/
 
 # Prisma client gerado
-generated/
-
-# Claude Code
-.claude
+/generated/
