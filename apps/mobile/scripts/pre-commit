@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Pre-commit hook: roda todos os testes unitários antes de permitir o commit.
+# Se algum teste falhar, o commit é bloqueado.
+#
+# Instalação: cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+# Garantir que JAVA_HOME aponte para o JBR do Android Studio (Windows)
+if [ -z "$JAVA_HOME" ] || ! command -v java > /dev/null 2>&1; then
+    AS_JBR="/c/Users/Usuario/AppData/Local/Programs/Android Studio/jbr"
+    if [ -d "$AS_JBR" ]; then
+        export JAVA_HOME="$AS_JBR"
+        export PATH="$JAVA_HOME/bin:$PATH"
+    else
+        echo "ERRO: JAVA_HOME não definido e JBR do Android Studio não encontrado em:"
+        echo "  $AS_JBR"
+        echo "Defina JAVA_HOME manualmente antes de commitar."
+        exit 1
+    fi
+fi
+
+echo ">>> Rodando testes unitários antes do commit..."
+
+if [ -f "./gradlew" ]; then
+    ./gradlew testDevelopmentDebugUnitTest --daemon --quiet
+    EXIT_CODE=$?
+else
+    echo "ERRO: gradlew não encontrado. Certifique-se de rodar o hook a partir da raiz do projeto."
+    exit 1
+fi
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo "  COMMIT BLOQUEADO: testes falharam."
+    echo "  Corrija os erros acima e tente novamente."
+    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    echo ""
+    exit 1
+fi
+
+echo ">>> Todos os testes passaram. Prosseguindo com o commit."
+exit 0
