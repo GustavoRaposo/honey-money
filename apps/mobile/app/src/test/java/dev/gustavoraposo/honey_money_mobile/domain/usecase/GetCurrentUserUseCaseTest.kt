@@ -1,5 +1,6 @@
 package dev.gustavoraposo.honey_money_mobile.domain.usecase
 
+import dev.gustavoraposo.honey_money_mobile.domain.model.Profile
 import dev.gustavoraposo.honey_money_mobile.domain.model.User
 import dev.gustavoraposo.honey_money_mobile.domain.repository.UserRepository
 import io.mockk.coEvery
@@ -23,7 +24,7 @@ class GetCurrentUserUseCaseTest {
 
     @Test
     fun `dado token valido quando invoke chamado entao retorna usuario`() = runTest {
-        val expectedUser = User(1, "Gustavo Foroutan Raposo", "gustavo@email.com", "2026-03-07T04:37:56.587Z")
+        val expectedUser = User(1, "Gustavo Foroutan Raposo", "gustavo@email.com", Profile(1, "user"), "2026-03-07T04:37:56.587Z")
         coEvery { userRepository.getCurrentUser("token123") } returns Result.success(expectedUser)
 
         val result = getCurrentUserUseCase("token123")
