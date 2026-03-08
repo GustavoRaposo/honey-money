@@ -1,6 +1,7 @@
 package dev.gustavoraposo.honey_money_mobile.data.repository
 
 import dev.gustavoraposo.honey_money_mobile.data.remote.UserApiService
+import dev.gustavoraposo.honey_money_mobile.data.remote.dto.ProfileDto
 import dev.gustavoraposo.honey_money_mobile.data.remote.dto.UserDto
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -26,7 +27,7 @@ class UserRepositoryImplTest {
 
     @Test
     fun `dado token valido quando getCurrentUser chamado entao envia Bearer no header`() = runTest {
-        val userDto = UserDto(1, "Gustavo", "gustavo@email.com", "2026-03-07T04:37:56.587Z")
+        val userDto = UserDto(1, "Gustavo", "gustavo@email.com", ProfileDto(1, "user"), "2026-03-07T04:37:56.587Z")
         coEvery { userApiService.getCurrentUser("Bearer meu_token") } returns Response.success(userDto)
 
         userRepository.getCurrentUser("meu_token")
@@ -36,7 +37,7 @@ class UserRepositoryImplTest {
 
     @Test
     fun `dado resposta bem sucedida quando getCurrentUser chamado entao retorna User de dominio`() = runTest {
-        val userDto = UserDto(1, "Gustavo Foroutan Raposo", "gustavo@email.com", "2026-03-07T04:37:56.587Z")
+        val userDto = UserDto(1, "Gustavo Foroutan Raposo", "gustavo@email.com", ProfileDto(1, "user"), "2026-03-07T04:37:56.587Z")
         coEvery { userApiService.getCurrentUser(any()) } returns Response.success(userDto)
 
         val result = userRepository.getCurrentUser("token123")

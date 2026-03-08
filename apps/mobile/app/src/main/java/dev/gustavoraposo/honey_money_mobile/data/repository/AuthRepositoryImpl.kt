@@ -46,4 +46,22 @@ class AuthRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun refresh(token: String): Result<String> {
+        return try {
+            val response = authApiService.refresh("Bearer $token")
+            if (response.isSuccessful) {
+                val accessToken = response.body()?.accessToken
+                if (accessToken != null) {
+                    Result.success(accessToken)
+                } else {
+                    Result.failure(Exception("Resposta vazia do servidor"))
+                }
+            } else {
+                Result.failure(Exception("Erro ${response.code()}: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

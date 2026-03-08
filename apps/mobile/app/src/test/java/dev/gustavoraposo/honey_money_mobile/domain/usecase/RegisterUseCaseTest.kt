@@ -1,5 +1,6 @@
 package dev.gustavoraposo.honey_money_mobile.domain.usecase
 
+import dev.gustavoraposo.honey_money_mobile.domain.model.Profile
 import dev.gustavoraposo.honey_money_mobile.domain.model.User
 import dev.gustavoraposo.honey_money_mobile.domain.repository.AuthRepository
 import io.mockk.coEvery
@@ -16,7 +17,7 @@ class RegisterUseCaseTest {
     private val authRepository: AuthRepository = mockk()
     private lateinit var registerUseCase: RegisterUseCase
 
-    private val fakeUser = User(1, "Gustavo", "gustavo@email.com", "2026-03-08T00:00:00.000Z")
+    private val fakeUser = User(1, "Gustavo", "gustavo@email.com", Profile(1, "user"), "2026-03-08T00:00:00.000Z")
 
     @Before
     fun setUp() {

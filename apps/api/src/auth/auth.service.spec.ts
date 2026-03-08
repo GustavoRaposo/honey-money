@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service.js';
 import { UsersService } from '../users/users.service.js';
 import { LoginDto } from './dto/login.dto.js';
+import type { AuthenticatedUser } from './strategies/jwt.strategy.js';
 import * as argon2 from 'argon2';
 
 jest.mock('argon2');
@@ -80,6 +81,28 @@ describe('AuthService', () => {
 
       await expect(service.login(dto)).rejects.toThrow(UnauthorizedException);
       expect(mockJwtService.sign).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('refresh', () => {
+    it('deve emitir novo accessToken com o mesmo payload do usuário autenticado', () => {
+      const authenticatedUser: AuthenticatedUser = {
+        id: 1,
+        email: 'joao@email.com',
+        profileId: 1,
+        profileName: 'user',
+      };
+      mockJwtService.sign.mockReturnValue('new_jwt_token');
+
+      const result = service.refresh(authenticatedUser);
+
+      expect(mockJwtService.sign).toHaveBeenCalledWith({
+        sub: authenticatedUser.id,
+        email: authenticatedUser.email,
+        profileId: authenticatedUser.profileId,
+        profileName: authenticatedUser.profileName,
+      });
+      expect(result).toEqual({ accessToken: 'new_jwt_token' });
     });
   });
 });

@@ -6,6 +6,7 @@ import dev.gustavoraposo.honey_money_mobile.data.remote.dto.RegisterRequestDto
 import dev.gustavoraposo.honey_money_mobile.data.remote.dto.UserDto
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface AuthApiService {
@@ -14,4 +15,7 @@ interface AuthApiService {
 
     @POST("users")
     suspend fun register(@Body request: RegisterRequestDto): Response<UserDto>
+
+    @POST("auth/refresh")
+    suspend fun refresh(@Header("Authorization") token: String): Response<LoginResponseDto>
 }
