@@ -312,6 +312,107 @@ apps/mobile/app/src/
 - Room testado com banco em memória (`Room.inMemoryDatabaseBuilder`).
 - UI com `ComposeTestRule` do `androidx.compose.ui.test`.
 
+### Testes de integração Mobile ↔ API
+
+No monorepo, o contrato entre mobile e API é definido pelos **DTOs de resposta da API** e mantido pela **Postman collection** gerada automaticamente em cada commit da API.
+
+#### Fonte de verdade do contrato
+
+`apps/api/honey-money.postman_collection.json` — gerado pelo hook a cada commit. Contém os shapes reais de request/response de todos os endpoints. **Consultar este arquivo antes de escrever qualquer mock no mobile.**
+
+#### Regras de consistência
+
+- Campos dos `data class` em `data/remote/dto/` devem corresponder exatamente aos campos dos `ResponseDto` da API (nome, tipo e nullabilidade).
+- Campos opcionais na API (TypeScript `?` ou sem `@IsNotEmpty`) devem ser `nullable` no Kotlin.
+- Status HTTP usados nos mocks (MockWebServer) devem corresponder ao que a API retorna de fato.
+- Nunca escrever um mock de resposta sem conferir o shape no Postman collection ou no Swagger da API.
+
+```kotlin
+// API: description?: string  →  Mobile data class:
+data class TaskDto(
+    val id: Int,
+    val name: String,
+    val description: String?,  // nullable — campo opcional na API
+    val priority: Int,
+    val statusCode: Int,
+)
+```
+
+#### Três camadas de testes de integração no mobile
+
+| Camada | O que testa | Onde fica | Ferramentas |
+|--------|------------|-----------|-------------|
+| **Contrato** | Retrofit desserializa corretamente a resposta da API | `test/data/remote/` | JUnit + MockWebServer |
+| **Repository** | Orquestração local (Room) + remoto (Retrofit) | `test/data/repository/` | JUnit + MockWebServer + Room in-memory |
+| **E2E** | Fluxo completo com API real rodando localmente | `androidTest/` | Compose Testing + API local |
+
+#### Testes de contrato com MockWebServer
+
+Validam que o Retrofit desserializa a resposta real da API. O JSON do mock deve ser copiado diretamente do Postman collection.
+
+```kotlin
+// test/data/remote/TaskApiTest.kt
+class TaskApiTest {
+    private lateinit var mockWebServer: MockWebServer
+    private lateinit var api: TaskApi
+
+    @Before
+    fun setUp() {
+        mockWebServer = MockWebServer()
+        api = Retrofit.Builder()
+            .baseUrl(mockWebServer.url("/"))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(TaskApi::class.java)
+    }
+
+    @Test
+    fun `dado resposta valida da api, quando buscar tarefas, entao deserializa corretamente`() {
+        // JSON copiado de apps/api/honey-money.postman_collection.json
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody("""[{"id":1,"name":"Tarefa","priority":1,"statusCode":0,"description":null}]""")
+        )
+
+        val result = runBlocking { api.getTasks() }
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0].name).isEqualTo("Tarefa")
+        assertThat(result[0].description).isNull()
+    }
+
+    @After
+    fun tearDown() = mockWebServer.shutdown()
+}
+```
+
+#### Fluxo TDD para uma funcionalidade cross-app (API + Mobile)
+
+**1. API — Red → Green → Refactor**
+- Escrever testes do endpoint na API.
+- Implementar o endpoint com seu `ResponseDto`.
+- Commitar — o hook gera a Postman collection atualizada automaticamente.
+
+**2. Mobile — teste de contrato (Red)**
+- Consultar o shape de resposta em `apps/api/honey-money.postman_collection.json`.
+- Escrever `*ApiTest` com MockWebServer usando o JSON exato da collection.
+- O teste falha porque o `data class` ou a interface Retrofit ainda não existe.
+
+**3. Mobile — data layer (Green)**
+- Criar o `data class` em `data/remote/dto/` espelhando o `ResponseDto` da API.
+- Criar/atualizar a interface Retrofit em `data/remote/`.
+- Teste de contrato passa.
+
+**4. Mobile — teste do repository (Red → Green)**
+- Escrever teste do repository com MockWebServer + Room in-memory.
+- Implementar o repository orquestrando remoto e local.
+
+**5. Mobile — use case e ViewModel (Red → Green → Refactor)**
+- Seguir o ciclo TDD normal com mocks do repository.
+
+---
+
 ### Pre-commit hook
 
 O hook raiz (`.githooks/pre-commit`) cobre **ambos os apps**:
