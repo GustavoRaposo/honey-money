@@ -1,5 +1,6 @@
 package dev.gustavoraposo.honey_money_mobile.ui.feature.auth
 
+import dev.gustavoraposo.honey_money_mobile.domain.model.Profile
 import dev.gustavoraposo.honey_money_mobile.domain.model.User
 import dev.gustavoraposo.honey_money_mobile.domain.usecase.LoginUseCase
 import dev.gustavoraposo.honey_money_mobile.domain.usecase.RegisterUseCase
@@ -28,7 +29,7 @@ class RegisterViewModelTest {
     private lateinit var viewModel: RegisterViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    private val fakeUser = User(1, "Gustavo Raposo", "gustavo@email.com", "2026-03-08T00:00:00.000Z")
+    private val fakeUser = User(1, "Gustavo Raposo", "gustavo@email.com", Profile(1, "user"), "2026-03-08T00:00:00.000Z")
 
     @Before
     fun setUp() {

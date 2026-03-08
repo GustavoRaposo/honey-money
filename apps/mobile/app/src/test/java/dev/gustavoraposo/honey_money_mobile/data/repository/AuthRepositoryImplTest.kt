@@ -62,4 +62,34 @@ class AuthRepositoryImplTest {
         assertTrue(result.isFailure)
         assertEquals("Sem conexão", result.exceptionOrNull()?.message)
     }
+
+    @Test
+    fun `dado token valido quando refresh chamado entao retorna novo accessToken`() = runTest {
+        val responseDto = LoginResponseDto(accessToken = "new_jwt_token")
+        coEvery { authApiService.refresh("Bearer old_token") } returns Response.success(responseDto)
+
+        val result = authRepository.refresh("old_token")
+
+        assertTrue(result.isSuccess)
+        assertEquals("new_jwt_token", result.getOrNull())
+    }
+
+    @Test
+    fun `dado token expirado quando refresh chamado entao retorna falha`() = runTest {
+        coEvery { authApiService.refresh(any()) } returns Response.error(401, "Unauthorized".toResponseBody())
+
+        val result = authRepository.refresh("expired_token")
+
+        assertTrue(result.isFailure)
+    }
+
+    @Test
+    fun `dado excecao de rede quando refresh chamado entao retorna falha`() = runTest {
+        coEvery { authApiService.refresh(any()) } throws IOException("Sem conexão")
+
+        val result = authRepository.refresh("meu_token")
+
+        assertTrue(result.isFailure)
+        assertEquals("Sem conexão", result.exceptionOrNull()?.message)
+    }
 }
