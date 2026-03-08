@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.gustavoraposo.honey_money_mobile.BuildConfig
 import dev.gustavoraposo.honey_money_mobile.domain.model.User
 import dev.gustavoraposo.honey_money_mobile.ui.theme.HoneymoneymobileTheme
 
@@ -55,7 +56,8 @@ fun LoginScreen(
         onEmailChange = viewModel::onEmailChange,
         onPasswordChange = viewModel::onPasswordChange,
         onLoginClick = viewModel::onLoginClick,
-        onNavigateToRegister = onNavigateToRegister
+        onNavigateToRegister = onNavigateToRegister,
+        appVersion = "v${BuildConfig.VERSION_NAME} · ${BuildConfig.FLAVOR}"
     )
 }
 
@@ -65,7 +67,8 @@ private fun LoginContent(
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
-    onNavigateToRegister: () -> Unit = {}
+    onNavigateToRegister: () -> Unit = {},
+    appVersion: String = ""
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -179,6 +182,18 @@ private fun LoginContent(
                     Text("Não tem uma conta? Cadastre-se")
                 }
             }
+
+            if (appVersion.isNotEmpty()) {
+                Text(
+                    text = appVersion,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
+                        .testTag("login_version_badge")
+                )
+            }
         }
     }
 }
@@ -191,7 +206,8 @@ private fun LoginContentPreview() {
             uiState = LoginUiState(),
             onEmailChange = {},
             onPasswordChange = {},
-            onLoginClick = {}
+            onLoginClick = {},
+            appVersion = "v1.0-dev · development"
         )
     }
 }

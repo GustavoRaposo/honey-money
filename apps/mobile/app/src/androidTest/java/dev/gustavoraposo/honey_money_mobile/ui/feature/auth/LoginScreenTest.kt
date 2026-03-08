@@ -52,4 +52,9 @@ class LoginScreenTest {
         composeRule.onNodeWithTag("login_email_field").performTextInput("test@email.com")
         composeRule.onNodeWithTag("login_password_field").assertIsDisplayed()
     }
+
+    @Test
+    fun dadoTelaAberta_entaoExibeVersaoEAmbienteDoApp() {
+        composeRule.onNodeWithTag("login_version_badge").assertIsDisplayed()
+    }
 }
