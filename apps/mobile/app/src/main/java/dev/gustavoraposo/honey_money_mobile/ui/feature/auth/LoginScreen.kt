@@ -57,7 +57,10 @@ fun LoginScreen(
         onPasswordChange = viewModel::onPasswordChange,
         onLoginClick = viewModel::onLoginClick,
         onNavigateToRegister = onNavigateToRegister,
-        appVersion = "v${BuildConfig.VERSION_NAME} · ${BuildConfig.FLAVOR}"
+        appVersion = run {
+            val suffix = if (BuildConfig.FLAVOR == "development") "-dev" else ""
+            "v${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}$suffix · ${BuildConfig.FLAVOR}"
+        }
     )
 }
 
@@ -207,7 +210,7 @@ private fun LoginContentPreview() {
             onEmailChange = {},
             onPasswordChange = {},
             onLoginClick = {},
-            appVersion = "v1.0-dev · development"
+            appVersion = "v1.0+1-dev · development"
         )
     }
 }

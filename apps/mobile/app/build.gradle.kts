@@ -1,3 +1,4 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -26,7 +27,6 @@ android {
             dimension = "environment"
             buildConfigField("String", "BASE_URL", "\"http://192.168.15.16:5000\"")
             applicationIdSuffix = ".dev"
-            versionNameSuffix = "-dev"
         }
         create("production") {
             dimension = "environment"
